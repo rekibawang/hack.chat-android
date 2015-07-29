@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+
+<resources>
+    <!-- Base application theme. -->
+
+    <style name="AppTheme" parent="AppTheme.Base">
+
+        <!-- Customize your theme here. -->
+
+    </style>
+
+    <style name="AppTheme.Base" parent="Theme.AppCompat.NoActionBar">
+        <!--<item name="colorPrimary">@color/colorPrimary</item>-->
+        <!--<item name="colorPrimaryDark">@color/colorPrimaryDark</item>-->
+        <item name="colorAccent">@color/colorAccent</item>
+        <!--<item name="statusBarColor">@color/colorPrimaryDark</item>-->
+    </style>
+    
+    
+    <!-- Style for AlertDialog ** by RP :) ** -->
+    <style name="AppCompatAlertDialog" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+</resources>

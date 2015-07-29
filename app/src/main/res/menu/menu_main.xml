@@ -1,0 +1,31 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_json"
+        android:orderInCategory="100"
+        android:title="Send raw json"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_share"
+        android:icon="@mipmap/ic_share"
+        android:orderInCategory="10"
+        android:title="Share"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_notifications"
+        android:icon="@mipmap/ic_notifications_on"
+        android:orderInCategory="2"
+        android:title="Mute notifications"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_reconnect"
+        android:icon="@mipmap/ic_reconnect"
+        android:orderInCategory="1"
+        android:title="Reconnect"
+        app:showAsAction="always" />
+    \
+</menu>
