@@ -13,7 +13,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textSize="25dp"
         android:padding="10dp"
-        android:textColor="#00ff00"
+        android:textColor="#7FFF00"
         android:text="Online Users: " />
 
     <ListView

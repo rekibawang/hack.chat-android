@@ -51,7 +51,7 @@ public class Chat extends ActionBarActivity implements OnlineNavDrawerFragment.G
     final static String url = "wss://hack.chat/chat-ws";
 
     WebSocketClient ws;
-    String nick = "", channel = "", lastSent = "";
+    String myNick = "", channel = "", lastSent = "";
     ArrayList<String> onlineList;
 
     ArrayList<MessageItem> messageList;
@@ -209,7 +209,9 @@ public class Chat extends ActionBarActivity implements OnlineNavDrawerFragment.G
         ws = new WebSocketClient(URI.create(url), new WebSocketClient.Listener() {
             @Override
             public void onConnect() {
-                String data = "{cmd: 'join', channel: " + channel + ", nick: \"" + nick + "\"}";
+                String data = "{cmd: 'join', channel: " + channel + ", nick: \"" + myNick + "\"}";
+                myNick = myNick.split("#")[0];
+
                 try {
                     send(new JSONObject(data));
                 } catch (JSONException e) {
@@ -228,7 +230,7 @@ public class Chat extends ActionBarActivity implements OnlineNavDrawerFragment.G
                             String cls = "";
                             if (obj.has("admin")) {
                                 cls = "admin";
-                            } else if (obj.getString("nick").equals(nick)) {
+                            } else if (obj.getString("nick").equals(myNick)) {
                                 cls = "me";
                             }
                             if (obj.has("trip"))
@@ -348,7 +350,7 @@ public class Chat extends ActionBarActivity implements OnlineNavDrawerFragment.G
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (nick.equals("") == false && ws != null) { // ws == null when start() is not called; this happens when invalid nick is entered
+        if (myNick.equals("") == false && ws != null) { // ws == null when start() is not called; this happens when invalid nick is entered
             ws.disconnect();
         }
     }
@@ -369,7 +371,7 @@ public class Chat extends ActionBarActivity implements OnlineNavDrawerFragment.G
         messageItem.setTime(time);
         messageItem.setCls(cls);
         messageItem.setTrip(trip);
-        messageItem.setMyNick(this.nick);
+        messageItem.setMyNick(myNick);
 
         runOnUiThread(new Runnable() {
             @Override
@@ -432,7 +434,7 @@ public class Chat extends ActionBarActivity implements OnlineNavDrawerFragment.G
         String lastNickname = prefs.getString(KEY_NICKNAME, "");
 
         if (lastNickname.length() > 0) {
-            nick = lastNickname;
+            myNick = lastNickname;
             input.setText(lastNickname);
             input.setSelection(input.getText().length());
         }
@@ -443,12 +445,12 @@ public class Chat extends ActionBarActivity implements OnlineNavDrawerFragment.G
             public void onClick(DialogInterface dialog, int whichButton) {
 
                 imm.hideSoftInputFromWindow(input.getWindowToken(), 0);
-                if (nick.equals("") != true && ws != null) { // if connected, close previous connection
+                if (myNick.equals("") != true && ws != null) { // if connected, close previous connection
                     ws.disconnect();
                 }
-                nick = input.getText().toString().trim();
+                myNick = input.getText().toString().trim();
 
-                if (!nick.matches("[A-Za-z0-9_#]+")) {
+                if (!myNick.matches("[A-Za-z0-9_#]+")) {
                     pushMessage("!", "Nickname must consist of up to 24 letters, numbers, and underscores (no spaces, etc.). " +
                             "Press the reconnect button at the top.", "", "warn", "");
                     return;
@@ -461,7 +463,7 @@ public class Chat extends ActionBarActivity implements OnlineNavDrawerFragment.G
                     // Too afraid to remove it now :)
                 }
                 SharedPreferences.Editor editor = prefs.edit();
-                editor.putString(KEY_NICKNAME, nick);
+                editor.putString(KEY_NICKNAME, myNick);
                 editor.commit();
 
                 start();
@@ -488,7 +490,7 @@ public class Chat extends ActionBarActivity implements OnlineNavDrawerFragment.G
             getButton() can only be called after alert.show()
             Diabling positive button when no nickname is entered in the EditText
          */
-        if (nick.equals("")) {
+        if (myNick.equals("")) {
             dialog.getButton(Dialog.BUTTON_POSITIVE).setEnabled(false);
         }
         input.addTextChangedListener(new TextWatcher() {
