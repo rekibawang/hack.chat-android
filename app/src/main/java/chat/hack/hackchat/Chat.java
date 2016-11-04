@@ -208,6 +208,20 @@ public class Chat extends ActionBarActivity implements OnlineNavDrawerFragment.G
 
         ws = new WebSocketClient(URI.create(url), new WebSocketClient.Listener() {
             @Override
+            public long getInterval() {
+                return 4*60*1000; // every 4 minutes
+            }
+
+            @Override
+            public void onInterval() {
+                try {
+                    send(new JSONObject("{cmd: 'ping'}"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
             public void onConnect() {
                 String data = "{cmd: 'join', channel: " + channel + ", nick: \"" + myNick + "\"}";
                 myNick = myNick.split("#")[0];

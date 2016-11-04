@@ -25,6 +25,8 @@ import java.security.KeyManagementException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class WebSocketClient {
     private static final String TAG = "WebSocketClient";
@@ -33,6 +35,7 @@ public class WebSocketClient {
     private Listener                 mListener;
     private Socket                   mSocket;
     private Thread                   mThread;
+    private Timer                    mPingTimer;
     private HandlerThread            mHandlerThread;
     private Handler                  mHandler;
     private List<BasicNameValuePair> mExtraHeaders;
@@ -52,6 +55,7 @@ public class WebSocketClient {
         mExtraHeaders = extraHeaders;
         mParser       = new HybiParser(this);
 
+        mPingTimer = new Timer();
         mHandlerThread = new HandlerThread("websocket-thread");
         mHandlerThread.start();
         mHandler = new Handler(mHandlerThread.getLooper());
@@ -69,6 +73,8 @@ public class WebSocketClient {
         mThread = new Thread(new Runnable() {
             @Override
             public void run() {
+                long pingInterval = mListener.getInterval();
+
                 try {
                     String secret = createSecret();
 
@@ -135,6 +141,17 @@ public class WebSocketClient {
 
                     mListener.onConnect();
 
+                    if (pingInterval > 0) {
+                        // Start ping timer
+                        mPingTimer = new Timer();
+                        mPingTimer.scheduleAtFixedRate(new TimerTask() {
+                            @Override
+                            public void run() {
+                                mListener.onInterval();
+                            }
+                        }, pingInterval, pingInterval);
+                    }
+
                     // Now decode websocket frames.
                     mParser.start(stream);
 
@@ -149,6 +166,9 @@ public class WebSocketClient {
 
                 } catch (Exception ex) {
                     mListener.onError(ex);
+                } finally {
+                    mPingTimer.cancel();
+                    mPingTimer = null;
                 }
             }
         });
@@ -255,6 +275,8 @@ public class WebSocketClient {
         public void onMessage(byte[] data);
         public void onDisconnect(int code, String reason);
         public void onError(Exception error);
+        public long getInterval(); // return 0 to disable
+        public void onInterval();
     }
 
     private SSLSocketFactory getSSLSocketFactory() throws NoSuchAlgorithmException, KeyManagementException {
