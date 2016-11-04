@@ -174,11 +174,11 @@ public class Chat extends ActionBarActivity implements OnlineNavDrawerFragment.G
             @Override
             public void onClick(View v) {
                 String text = etMessage.getText().toString();
-                // text should be within quotes for messages with spaces
-                String data = "{cmd: 'chat', text: \"" + text + "\"}";
-
                 try {
-                    send(new JSONObject(data));
+                    JSONObject command = new JSONObject();
+                    command.put("cmd", "chat");
+                    command.put("text", text);
+                    send(command);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
