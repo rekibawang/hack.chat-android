@@ -43,30 +43,34 @@ import org.json.JSONObject;
 import java.net.URI;
 import java.util.ArrayList;
 
-public class Chat extends ActionBarActivity implements OnlineNavDrawerFragment.GetDataInterface, OnlineNavDrawerFragment.PassDataInterface {
-    ListView lvMessages;
-    EditText etMessage;
-    ImageButton bSend;
+import chat.hack.hackchat.chat.hack.hackchat.ads.HackChatInterstitialAd;
+import chat.hack.hackchat.chat.hack.hackchat.ads.HackChatInterstitialAdvertable;
 
-    final static String url = "wss://hack.chat/chat-ws";
+public class Chat extends ActionBarActivity implements OnlineNavDrawerFragment.GetDataInterface,
+        OnlineNavDrawerFragment.PassDataInterface, HackChatInterstitialAdvertable {
+    private ListView lvMessages;
+    private EditText etMessage;
+    private ImageButton bSend;
 
-    WebSocketClient ws;
-    String myNick = "", channel = "", lastSent = "";
-    ArrayList<String> onlineList;
+    private final static String url = "wss://hack.chat/chat-ws";
 
-    ArrayList<MessageItem> messageList;
-    ListViewAdapter adapter;
-    Toolbar toolbar;
+    private WebSocketClient ws;
+    private String myNick = "", channel = "", lastSent = "";
+    private ArrayList<String> onlineList;
 
-    DrawerLayout mDrawerLayout;
+    private ArrayList<MessageItem> messageList;
+    private ListViewAdapter adapter;
+    private Toolbar toolbar;
 
-    int unread = 0;
-    boolean appInBackground = false;
-    boolean allowNotifications = true;
+    private DrawerLayout mDrawerLayout;
 
-    boolean reconnect = false; // to display "Recoonected" after connection broken. Also, prevents listview from being cleared.
+    private int unread = 0;
+    private boolean appInBackground = false;
+    private boolean allowNotifications = true;
+
+    private boolean reconnect = false; // to display "Recoonected" after connection broken. Also, prevents listview from being cleared.
     // Set it to "false" again when joining with a different/same nickname again.
-    boolean exitUsingBackKey = false; // onDisconnect() is called again after this activity is closed using back key; this creates
+    private boolean exitUsingBackKey = false; // onDisconnect() is called again after this activity is closed using back key; this creates
     // a websocket connection again. So the chat starts in the background again.
 
     public static final String prefsFile = "chatroomNicknameFile";
@@ -74,10 +78,14 @@ public class Chat extends ActionBarActivity implements OnlineNavDrawerFragment.G
     public static final String KEY_NICKNAME = "lastNickname";
     public static final String KEY_JSON = "lastJson";
 
+    private HackChatInterstitialAd interstitialAd;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.chat);
+
+        interstitialAd = new HackChatInterstitialAd(this, getResources().getString(R.string.chatroomAdUniId));
 
         Bundle bundle = getIntent().getExtras();
         channel = bundle.getString(KEY_CHATROOM);
@@ -341,6 +349,7 @@ public class Chat extends ActionBarActivity implements OnlineNavDrawerFragment.G
         if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
             mDrawerLayout.closeDrawers();
         } else {
+            interstitialAd.show();
             super.onBackPressed();
             exitUsingBackKey = true;
         }
@@ -653,6 +662,11 @@ public class Chat extends ActionBarActivity implements OnlineNavDrawerFragment.G
         // to show keyboard
         input.requestFocus();
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+    }
+
+    @Override
+    public void onInterstitialAdClosed() {
+        // Do nothing
     }
 
     private boolean hasInternet() {
