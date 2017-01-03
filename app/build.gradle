@@ -8,12 +8,14 @@ android {
         applicationId "chat.hack.hackchat"
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 7
-        versionName "1.2.2"
+        versionCode 9
+        versionName "1.2.4"
+        multiDexEnabled true
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true        
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
